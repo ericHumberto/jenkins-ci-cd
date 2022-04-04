@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                 cleanWs()
+                cleanWs()
 
                 git branch: 'main',
                     url: 'https://github.com/ericHumberto/springboot-test-CI'
@@ -30,12 +30,11 @@ pipeline {
                         sh './gradlew sonarqube'
                     }
         }
-        // stage('SAST') {
-        //     steps {
-        //         sh 'curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/main/deployments/scripts/install.sh | bash -s latest'
-        //         sh 'horusec start -p="./" -e="true"'
-        //     }
-        // }
+        stage('SAST') {
+            steps {
+                sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/src/horusec horuszup/horusec-cli:latest horusec start -p /src/horusec -P $(pwd) --config-file-path=/src/horusec/horusec-config.json'
+            }
+        }
         stage('Unit Tests') {
             steps {
                 sh './gradlew test'
@@ -46,20 +45,20 @@ pipeline {
                 }
             }
         }
-        // stage('Integration Tests') {
-        //     steps {
-        //         sh './gradlew integrationTest'
-        //     }
-        //     post {
-        //         always {
-        //                     junit '**/build/test-results/integrationTest/TEST-*.xml'
-        //         }
-        //     }
-        // }
-        // stage('E2E') {
-        // }
-        // stage('Security') {
-        // }
+    // stage('Integration Tests') {
+    //     steps {
+    //         sh './gradlew integrationTest'
+    //     }
+    //     post {
+    //         always {
+    //                     junit '**/build/test-results/integrationTest/TEST-*.xml'
+    //         }
+    //     }
+    // }
+    // stage('E2E') {
+    // }
+    // stage('Security') {
+    // }
     // stage('Promotion') {
     //     steps {
     //         timeout(time: 1, unit:'DAYS') {
@@ -67,23 +66,16 @@ pipeline {
     //         }
     //     }
     // }
-    // stage('Deploy to Production') {
+    // stage('Deploy DEV') {
     //     environment {
-    //         HEROKU_API_KEY = credentials('HEROKU_API_KEY')
     //     }
     //     steps {
-    //         unstash 'app'
-    //         gradlew('deployHeroku')
     //     }
     // }
     }
-// post {
-//     failure {
-//         mail to: 'eric.c.humberto@gmail.com', subject: 'Build failed', body: 'Please fix!'
-//     }
-// }
+    post {
+        failure {
+            mail to: 'eric.c.humberto@gmail.com', subject: 'Build failed', body: 'Please fix!'
+        }
+    }
 }
-
-// def gradlew(String... args) {
-//     sh "./gradlew ${args.join(' ')} -s"
-// }
