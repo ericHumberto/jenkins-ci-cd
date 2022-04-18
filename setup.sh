@@ -19,3 +19,4 @@ echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main |
 sudo apt-get update
 sudo apt-get install trivy
 sudo curl https://get.okteto.com -sSfL | sh
+sudo apt install unzip
