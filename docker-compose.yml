@@ -2,7 +2,7 @@ version: '2'
 
 services:
   sonarqube:
-    image: sonarqube:7.6-community 
+    image: sonarqube:latest
     volumes:
       - sonarqube_conf:/opt/sonarqube/conf
       - sonarqube_data:/opt/sonarqube/data
